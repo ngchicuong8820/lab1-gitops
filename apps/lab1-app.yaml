@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ngchicuong8820/lab1-app:v23
+        image: ngchicuong8820/lab1-app:v28
         imagePullPolicy: IfNotPresent
         command: ["sh", "-c", "cd /app/backend && uvicorn main:app --host 0.0.0.0 --port 8000"]
         ports:
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ngchicuong8820/lab1-app:v23
+        image: ngchicuong8820/lab1-app:v28
         imagePullPolicy: IfNotPresent
         command: ["sh", "-c", "cd /app/frontend && streamlit run app.py --server.port 8501 --server.address 0.0.0.0"]
         ports:
