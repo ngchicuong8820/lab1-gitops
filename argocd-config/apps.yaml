@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/ngchicuong8820/Lab_1.git' # THAY URL CỦA BẠN
+    repoURL: 'https://github.com/ngchicuong8820/lab1-gitops.git' # THAY URL CỦA BẠN
     targetRevision: HEAD
-    path: gitops-repo/apps
+    path: apps
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default

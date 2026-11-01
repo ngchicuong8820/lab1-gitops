@@ -8,7 +8,7 @@ spec:
     - name: backend-alerts
       rules:
         - alert: BackendServiceDown
-          expr: up{job="backend-metrics"} == 0
+          expr: up{job="lab1-backend"} == 0
           for: 1m
           labels:
             severity: critical
