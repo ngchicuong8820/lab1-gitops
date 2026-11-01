@@ -12,6 +12,7 @@ spec:
     targetRevision: 0.35.0
     helm:
       values: |
+        fullnameOverride: "vm"
         grafana:
           enabled: true
         prometheus-node-exporter:
