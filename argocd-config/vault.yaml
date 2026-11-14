@@ -15,7 +15,7 @@ spec:
           standalone:
             enabled: true
           dataStorage:
-            enabled: false
+            enabled: true
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: vault
