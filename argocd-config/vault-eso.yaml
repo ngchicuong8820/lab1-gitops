@@ -1,3 +1,9 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eso-service-account
+  namespace: default
+---
 apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
 metadata:
@@ -5,6 +11,7 @@ metadata:
   namespace: default
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   provider:
     vault:
@@ -12,9 +19,11 @@ spec:
       path: "secret"
       version: "v2"
       auth:
-        tokenSecretRef:
-          name: "vault-token"
-          key: "token"
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "eso-role"
+          serviceAccountRef:
+            name: "eso-service-account"
 ---
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
@@ -24,14 +33,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  refreshInterval: "15s" # Cứ 15s kiểm tra Vault 1 lần
+  refreshInterval: "15s"
   secretStoreRef:
     name: vault-backend
     kind: SecretStore
   target:
-    name: backend-env-secret # Tên K8s Secret mà ESO sẽ tự động đẻ ra
+    name: backend-env-secret
   data:
-  - secretKey: DB_PASSWORD
-    remoteRef:
-      key: "lab1/backend"
-      property: DB_PASSWORD
+    - secretKey: DB_PASSWORD
+      remoteRef:
+        key: "lab1/backend"
+        property: DB_PASSWORD
