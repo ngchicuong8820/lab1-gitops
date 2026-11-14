@@ -3,6 +3,9 @@ kind: SecretStore
 metadata:
   name: vault-backend
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   provider:
     vault:
@@ -19,6 +22,9 @@ kind: ExternalSecret
 metadata:
   name: backend-db-secret
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   refreshInterval: "15s" # Cứ 15s kiểm tra Vault 1 lần
   secretStoreRef:
