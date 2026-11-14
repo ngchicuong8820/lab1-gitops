@@ -1,34 +1,46 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: vault
-  namespace: argocd
+  name: eso-service-account
+  namespace: default
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "1"
 spec:
-  project: default
-  source:
-    repoURL: 'https://helm.releases.hashicorp.com'
-    chart: vault
-    targetRevision: 0.28.0
-    helm:
-      values: |
-        server:
-          standalone:
-            enabled: true
-          dataStorage:
-            enabled: true
-            size: 5Gi
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: vault
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-  ignoreDifferences:
-    - group: admissionregistration.k8s.io
-      kind: MutatingWebhookConfiguration
-      name: vault-agent-injector-cfg
-      jqPathExpressions:
-        - '.webhooks[].clientConfig.caBundle'
+  provider:
+    vault:
+      server: "http://vault.vault.svc.cluster.local:8200"
+      path: "secret"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "eso-role"
+          serviceAccountRef:
+            name: "eso-service-account"
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: backend-db-secret
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  refreshInterval: "15s" # Cứ 15s kiểm tra Vault 1 lần
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: backend-env-secret # Tên K8s Secret mà ESO sẽ tự động đẻ ra
+  data:
+    - secretKey: DB_PASSWORD
+      remoteRef:
+        key: "lab1/backend"
+        property: DB_PASSWORD
