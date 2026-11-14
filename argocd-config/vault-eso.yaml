@@ -1,17 +1,8 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: eso-service-account
-  namespace: default
----
 apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
 metadata:
   name: vault-backend
   namespace: default
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   provider:
     vault:
@@ -24,23 +15,3 @@ spec:
           role: "eso-role"
           serviceAccountRef:
             name: "eso-service-account"
----
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: backend-db-secret
-  namespace: default
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-spec:
-  refreshInterval: "15s"
-  secretStoreRef:
-    name: vault-backend
-    kind: SecretStore
-  target:
-    name: backend-env-secret
-  data:
-    - secretKey: DB_PASSWORD
-      remoteRef:
-        key: "lab1/backend"
-        property: DB_PASSWORD
